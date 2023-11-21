@@ -26,6 +26,8 @@ build:
 package:
   stage: package
   image: docker:latest
+ services:
+ - docker:dind
   only:
   - main
   dependencies:
