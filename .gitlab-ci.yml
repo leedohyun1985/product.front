@@ -7,22 +7,21 @@ stages:
  - build
  - package
 
-cache:
-  paths:
-    - node_modules/
-    - .next/cache/
-
 build:
   stage: build
+  image: node:20-alpine
   only:
     - main
-  image: node:20-alpine
   script:
     - yarn
     - yarn build
+  cache:
+    paths:
+      - node_modules
   artifacts:
     paths:
-      - ./out
+      - .next
+      - build
 
 package:
   stage: package
