@@ -1,0 +1,33 @@
+variables:
+ DOCKER_HOST: tcp://docker:2375
+ DOCKER_TLS_CERTDIR: ""
+ DOCKER_DRIVER: overlay2
+
+image: node:16-alpine
+
+stages:
+  - build
+  - package
+
+build:
+  stage: build
+  only:
+    - main
+  script:
+    - yarn
+    - yarn build
+  artifacts:
+    paths:
+      - ./out
+
+package:
+  stage: package
+  only:
+    - main
+  image: docker:latest
+  dependencies:
+    - build
+  script:
+ - docker build -t $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:$CURRENT_IMAGE_VERSION -t $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:latest .
+ - docker push $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:$CURRENT_IMAGE_VERSION
+ - docker push $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:latest
