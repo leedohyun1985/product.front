@@ -1,28 +1,31 @@
-image: node:20-alpine
-
 stages:
-  - build
-  - package
+ - build
+ - package
 
 build:
   stage: build
+  image : node:20
   only:
     - main
   script:
     - yarn
     - yarn build
+  cache:
+    paths:
+      - node_modules
   artifacts:
     paths:
-      - ./out
+    - .next
+    - build
 
 package:
   stage: package
-  only:
-    - main
   image: docker:latest
+  only:
+  - main
   dependencies:
-    - build
+  - build
   script:
- - docker build -t $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:$CURRENT_IMAGE_VERSION -t $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:latest .
- - docker push $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:$CURRENT_IMAGE_VERSION
- - docker push $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:latest
+  - docker build -t $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:$CURRENT_IMAGE_VERSION -t $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:latest .
+  - docker push $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:$CURRENT_IMAGE_VERSION
+  - docker push $PRIVATE_REGISTRY_URL/$CI_PROJECT_NAME:latest
